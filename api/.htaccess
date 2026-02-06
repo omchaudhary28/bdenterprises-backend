@@ -1,0 +1,28 @@
+DirectorySlash Off
+
+<IfModule mod_setenvif.c>
+    SetEnvIfNoCase Origin "^https://bdenterprises\\.in$" ACAO=https://bdenterprises.in
+    SetEnvIfNoCase Origin "^https://www\\.bdenterprises\\.in$" ACAO=https://www.bdenterprises.in
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "%{ACAO}e" env=ACAO
+    Header always set Vary "Origin" env=ACAO
+    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, Accept"
+    Header always set Access-Control-Max-Age "86400"
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Remove .php extension from URLs
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)\.php$ - [L]
+    
+    # Route requests to appropriate PHP files
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?path=$1 [QSA,L]
+</IfModule>
