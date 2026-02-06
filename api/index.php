@@ -12,19 +12,22 @@ require_once __DIR__ . '/cors.php';
 // Enable CORS
 
 
-// Parse the requested path
-$request_uri = $_SERVER['REQUEST_URI'];
-$script_name = dirname($_SERVER['SCRIPT_NAME']);
+// Prefer the rewrite "path" value when available, fallback to URI parsing
+$path = $_GET['path'] ?? '';
+if ($path === '') {
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $script_name = dirname($_SERVER['SCRIPT_NAME']);
 
-// Remove the script directory from the URI
-if (strpos($request_uri, $script_name) === 0) {
-    $path = substr($request_uri, strlen($script_name));
-} else {
-    $path = $request_uri;
+    // Remove the script directory from the URI
+    if (strpos($request_uri, $script_name) === 0) {
+        $path = substr($request_uri, strlen($script_name));
+    } else {
+        $path = $request_uri;
+    }
+
+    // Remove query string
+    $path = strtok($path, '?');
 }
-
-// Remove query string
-$path = strtok($path, '?');
 
 // Remove leading/trailing slashes
 $path = trim($path, '/');
